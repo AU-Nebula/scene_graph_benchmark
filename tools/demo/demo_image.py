@@ -64,6 +64,9 @@ def main():
     parser.add_argument("opts", default=None, nargs=argparse.REMAINDER,
                         help="Modify config options using the command-line")
 
+    if not torch.cuda.is_available():
+        cfg.MODEL.DEVICE = "cpu"
+
     args = parser.parse_args()
     cfg.set_new_allowed(True)
     cfg.merge_from_other_cfg(sg_cfg)
