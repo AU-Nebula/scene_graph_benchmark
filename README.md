@@ -8,7 +8,7 @@
 - Clone repository: `git clone https://github.com/AU-Nebula/scene_graph_benchmark.git SGB`
 - Change directory: `cd SGB`
 - Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
-- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 ./Dockerfile/`
+- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 ./DockerfileCPU/`
 - Run it: `docker run -it -v $PWD:/kern_nemesis au/sgb:10.1-cudnn7-devel-ubuntu18.04`
 - Activate *conda* environment: `conda activate kern_nemesis`
 - Compile `maskrcnn_benchmark`: `python setup.py build develop`
