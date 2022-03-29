@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 # Download pretrained models
 
 export MAIN_DIR=$PWD
