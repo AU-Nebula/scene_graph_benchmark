@@ -4,6 +4,7 @@ import cv2
 import os.path as op
 import argparse
 import json
+import torch
 
 from scene_graph_benchmark.scene_parser import SceneParser
 from scene_graph_benchmark.AttrRCNN import AttrRCNN
