@@ -1,6 +1,7 @@
 # Copyright (c) 2021 Microsoft Corporation. Licensed under the MIT license. 
 import torch
 import torch.nn as nn
+# import demo_image
 
 
 class FrequencyBias(nn.Module):
@@ -53,7 +54,7 @@ class FrequencyBias(nn.Module):
         return baseline
 
 
-def _get_tensor_from_boxlist(proposals, field='labels'):
+def _get_tensor_from_boxlist(proposals, field='labels', framework_device="cuda"):
     # helper function for getting
     # tensor data from BoxList structures
 
@@ -79,8 +80,10 @@ def _get_tensor_from_boxlist(proposals, field='labels'):
             im_inds = torch.cat(
                 (im_inds, im_ind * torch.ones(num_proposals_im, 1)), dim=0)
 
-    # TODO: support both cpu and gpu
-    im_inds_batch = torch.Tensor(im_inds).long().cuda()
+    im_inds_batch = torch.Tensor(im_inds).long()
+    if framework_device == "cuda":
+        im_inds_batch.to(torch.device("cuda"))
+        
 
     return bbox_batch, output_batch, im_inds_batch
 

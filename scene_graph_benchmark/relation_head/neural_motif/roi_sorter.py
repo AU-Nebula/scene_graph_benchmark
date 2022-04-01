@@ -43,7 +43,7 @@ class roi_sorter():
         new_inds = np.concatenate(new_inds, 0)
         return new_inds, new_lens
 
-    def _sort_by_score(self, im_inds, scores):
+    def _sort_by_score(self, im_inds, scores, framework_device="cuda"):
         """
         We'll sort everything scorewise from Hi->low, BUT we need to keep images together
         and sort LSTM from l
@@ -72,7 +72,9 @@ class roi_sorter():
         # e.g. inds[:,0] is first batch image's sequence for lstm processing
         # ls_transposed is T length list with each element numbered as B
         inds, ls_transposed = self.transpose_packed_sequence_inds(lengths)  # move it to TxB form
-        inds = torch.LongTensor(inds).cuda()
+        inds = torch.LongTensor(inds)
+        if framework_device == "cuda":
+            inds.to(torch.device("cuda"))
 
 
         # sort by confidence in the range (0,1)
@@ -115,7 +117,7 @@ class roi_sorter():
             return np.column_stack((boxes[:, :2] + 0.5 * wh, wh))
         return torch.cat((boxes[:, :2] + 0.5 * wh, wh), 1)
 
-    def sort(self, batch_idx, confidence, box_priors):
+    def sort(self, batch_idx, confidence, box_priors, framework_device="cuda"):
         """
         :param batch_idx: tensor with what index we're on
         :param confidence: tensor with confidences between [0,1)
@@ -138,4 +140,4 @@ class roi_sorter():
             scores = centers / (centers.max() + 1)
         else:
             raise ValueError("invalid mode {}".format(self.order))
-        return self._sort_by_score(batch_idx, scores)
+        return self._sort_by_score(batch_idx, scores, framework_device)
