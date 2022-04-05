@@ -74,7 +74,7 @@ class roi_sorter():
         inds, ls_transposed = self.transpose_packed_sequence_inds(lengths)  # move it to TxB form
         inds = torch.LongTensor(inds)
         if framework_device == "cuda":
-            inds.to(torch.device("cuda"))
+            inds = inds.to(torch.device("cuda"))
 
 
         # sort by confidence in the range (0,1)

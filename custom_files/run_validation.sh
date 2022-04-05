@@ -1,4 +1,3 @@
-#!/bin/bash
 set -e
 
 # Run Scene Graph generation on custom images

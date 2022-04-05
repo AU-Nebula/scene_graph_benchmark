@@ -70,7 +70,7 @@ def main():
     args = parser.parse_args()
 
     if not torch.cuda.is_available() and args.device=="cuda":
-        raise RuntimeError("No GPU available. Please check the device selected or set up again the software correctly")
+        raise RuntimeError("No GPU available. Please check the device selected or set up again the software by following the steps in the README file in section 1b")
 
     cfg.MODEL.DEVICE = args.device
     cfg.set_new_allowed(True)
