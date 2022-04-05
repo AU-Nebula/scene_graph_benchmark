@@ -1,3 +1,5 @@
+set -e
+
 # Download VG dataset
 
 export MAIN_DIR=$PWD

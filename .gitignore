@@ -36,6 +36,7 @@ dist/
 /models
 /output
 /exps
+/data
 .ptconfig
 .ptignore
 pretrained_model/

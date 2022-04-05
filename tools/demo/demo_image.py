@@ -60,15 +60,19 @@ def main():
                         help="filename to save the proceed image")
     parser.add_argument("--visualize_attr", action="store_true",
                         help="visualize the object attributes")
+    parser.add_argument("--device", default="cuda",
+                        help="choose the device you want to work with")
     parser.add_argument("--visualize_relation", action="store_true",
                         help="visualize the relationships")
     parser.add_argument("opts", default=None, nargs=argparse.REMAINDER,
                         help="Modify config options using the command-line")
 
-    if not torch.cuda.is_available():
-        cfg.MODEL.DEVICE = "cpu"
-
     args = parser.parse_args()
+
+    if not torch.cuda.is_available() and args.device=="cuda":
+        raise RuntimeError("No GPU available. Please check the device selected or set up again the software by following the steps in the README file in section 1b")
+
+    cfg.MODEL.DEVICE = args.device
     cfg.set_new_allowed(True)
     cfg.merge_from_other_cfg(sg_cfg)
     cfg.set_new_allowed(False)

@@ -25,6 +25,7 @@ class NeuralMotif(nn.Module):
         # to be compatible with interface design in generalized_rcnn and relation head
         assert config.MODEL.ROI_RELATION_HEAD.SHARE_BOX_FEATURE_EXTRACTOR is False
 
+        self.device = config.MODEL.DEVICE
         self.hidden_dim = config.MODEL.ROI_RELATION_HEAD.NEURAL_MOTIF.HIDDEN_DIM
         self.use_online_obj_labels = config.MODEL.ROI_RELATION_HEAD.USE_ONLINE_OBJ_LABELS
 
@@ -124,18 +125,18 @@ class NeuralMotif(nn.Module):
         # bboxes, cls_prob (N, k)
         # im_inds: (N,1), img ind for each roi in the batch
         obj_box_priors, obj_detector_prob_dists, im_inds \
-            = _get_tensor_from_boxlist(proposals, 'scores_all')
+            = _get_tensor_from_boxlist(proposals, 'scores_all', self.device)
         _, boxes_all, _ \
-            = _get_tensor_from_boxlist(proposals, 'boxes_all')
+            = _get_tensor_from_boxlist(proposals, 'boxes_all', self.device)
 
         # obj_gt_labels: (N,). Not one hot vector.
         obj_gt_labels = None
         if self.training:
             _, obj_gt_labels, _ \
-                = _get_tensor_from_boxlist(proposals, 'gt_labels')
+                = _get_tensor_from_boxlist(proposals, 'gt_labels', self.device)
         elif self.mode == 'predcls':
             _, obj_gt_labels, _ \
-                = _get_tensor_from_boxlist(proposals, 'labels')
+                = _get_tensor_from_boxlist(proposals, 'labels', self.device)
 
         # get index in the proposal pairs
         edge_visual_feats, rel_inds = self._union_box_feats(features, proposals, proposal_pairs)
