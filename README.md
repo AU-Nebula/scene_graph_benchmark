@@ -8,11 +8,12 @@
 - Clone repository: `git clone https://github.com/AU-Nebula/scene_graph_benchmark.git SGB`
 - Change directory: `cd SGB`
 
-If at least one GPU is available, follow section 1a, if not follow 1b.
+If at least one GPU is available, follow section 1a, if not, follow 1b.
 
 ### 1a. Setup for first-time use (Docker) - GPUs required
 
 For an automatic setup, use the following command: `sh installation_steps.sh 1`.
+
 Manual setup:
 
 - Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
@@ -31,6 +32,7 @@ Activation of the environments:
 ### 1b. Setup for first-time use (Docker) - CPU-only case
 
 For an automatic setup, use the following command: `sh installation_steps.sh 0`.
+
 Manual setup:
 
 - Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
