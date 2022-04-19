@@ -19,8 +19,8 @@ For an automatic setup, use the following command: `sh installation_steps.sh 1`.
 
 Manual setup:
 
-- Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
-- Download pre-trained model: `sh custom_files/download_pretrained.sh`
+- Download *Visual Genome* metadata: `sh scripts/download_VG.sh`
+- Download pre-trained model: `sh scripts/download_pretrained.sh`
 - Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
 - Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 . --build-arg FORCE_CUDA=1`
 
@@ -28,7 +28,7 @@ Activation of the environments:
 - Run Docker image: `docker run -it -v $PWD:/sgb --gpus all au/sgb:10.1-cudnn7-devel-ubuntu18.04`
 - Activate *conda* environment: `conda activate sgb`
 
-- Test model: `sh custom_files/run_validation.test.sh cuda`
+- Test model: `sh scripts/run_validation_image.sh cuda`
   
 *Output test image can be found in directory:* `custom_images/francesco_example/3_out.jpg`
 
@@ -38,8 +38,8 @@ For an automatic setup, use the following command: `sh installation_steps.sh 0`.
 
 Manual setup:
 
-- Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
-- Download pre-trained model: `sh custom_files/download_pretrained.sh`
+- Download *Visual Genome* metadata: `sh scripts/download_VG.sh`
+- Download pre-trained model: `sh scripts/download_pretrained.sh`
 - Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
 - Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 . --build-arg FORCE_CUDA=0`
 
@@ -47,7 +47,7 @@ Activation of the environments:
 - Run Docker image: `docker run -it -v $PWD:/sgb au/sgb:10.1-cudnn7-devel-ubuntu18.04`
 - Activate *conda* environment: `conda activate sgb`
 
-- Test model: `sh custom_files/run_validation.test.sh cpu`
+- Test model: `sh scripts/run_validation_image.sh cpu`
   
 *Output test image can be found in directory:* `custom_images/francesco_example/3_out.jpg`
 
