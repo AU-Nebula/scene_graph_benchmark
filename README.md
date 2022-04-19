@@ -22,7 +22,7 @@ Manual setup:
 - Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
 - Download pre-trained model: `sh custom_files/download_pretrained.sh`
 - Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
-- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 ./docker --build-arg FORCE_CUDA=1`
+- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 . --build-arg FORCE_CUDA=1`
 
 Activation of the environments:
 - Run Docker image: `docker run -it -v $PWD:/sgb --gpus all au/sgb:10.1-cudnn7-devel-ubuntu18.04`
@@ -41,7 +41,7 @@ Manual setup:
 - Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
 - Download pre-trained model: `sh custom_files/download_pretrained.sh`
 - Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
-- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 ./docker --build-arg FORCE_CUDA=0`
+- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 . --build-arg FORCE_CUDA=0`
 
 Activation of the environments:
 - Run Docker image: `docker run -it -v $PWD:/sgb au/sgb:10.1-cudnn7-devel-ubuntu18.04`
@@ -55,11 +55,6 @@ Activation of the environments:
 
 ### Work in progress
 
-#
-
-You can find below the original README
-
-#
 **This project is based on [maskrcnn-benchmark](https://github.com/facebookresearch/maskrcnn-benchmark)**
 
 ![alt text](demo/R152FPN_demo.png "from https://storage.googleapis.com/openimages/web/index.html")
