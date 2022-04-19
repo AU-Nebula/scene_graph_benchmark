@@ -106,6 +106,7 @@ class FPN2MLPFeatureExtractor(nn.Module):
         self.fc6 = make_fc(input_size, representation_size, use_gn)
         self.fc7 = make_fc(representation_size, representation_size, use_gn)
         self.out_channels = representation_size
+        self.device = cfg.MODEL.DEVICE
 
     def _union_box_feats(self, x, proposal_pairs, use_relu=True):
         proposals_union = [proposal_pair.copy_with_union() for proposal_pair in
@@ -125,11 +126,11 @@ class FPN2MLPFeatureExtractor(nn.Module):
         # bboxes, cls_prob (N, k)
         # im_inds: (N,1), img ind for each roi in the batch
         obj_box_priors, obj_labels, im_inds \
-            = _get_tensor_from_boxlist(proposals, 'labels')
+            = _get_tensor_from_boxlist(proposals, 'labels', self.device)
 
         # get index in the proposal pairs
         _, proposal_idx_pairs, im_inds_pairs = _get_tensor_from_boxlist(
-            proposal_pairs, 'idx_pairs')
+            proposal_pairs, 'idx_pairs', self.device)
 
         rel_inds = _get_rel_inds(im_inds, im_inds_pairs, proposal_idx_pairs, len(proposals))
 

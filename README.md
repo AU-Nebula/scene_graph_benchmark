@@ -4,23 +4,54 @@
 
 
 
+## 0. Requirements
+
 ## 1. Setup for first-time use (Docker)
 
 - Clone repository: `git clone https://github.com/AU-Nebula/scene_graph_benchmark.git SGB`
 - Change directory: `cd SGB`
-- Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
-- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04-pip3 .`
-- Run it: `docker run -it -v $PWD:/kern_nemesis --gpus all au/sgb:10.1-cudnn7-devel-ubuntu18.04-pip3`
-- Build `maskrcnn_benchmark`: `python setup.py build develop`
 
-Outside Docker:
+If at least one GPU is available, follow section 1a, if not, follow 1b.
+
+### 1a. Setup for first-time use (Docker) - GPUs required
+
+For an automatic setup, use the following command: `sh installation_steps.sh 1`.
+
+Manual setup:
 
 - Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
 - Download pre-trained model: `sh custom_files/download_pretrained.sh`
+- Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
+- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 ./docker --build-arg FORCE_CUDA=1`
 
-*This operation might take a while... Make yourself a coffee!*
+Activation of the environments:
+- Run Docker image: `docker run -it -v $PWD:/sgb --gpus all au/sgb:10.1-cudnn7-devel-ubuntu18.04`
+- Activate *conda* environment: `conda activate sgb`
 
-## 2. Generate Scene Graphs with custom dataset
+- Test model: `sh custom_files/run_validation.test.sh cuda`
+  
+*Output test image can be found in directory:* `custom_images/francesco_example/3_out.jpg`
+
+### 1b. Setup for first-time use (Docker) - CPU-only case
+
+For an automatic setup, use the following command: `sh installation_steps.sh 0`.
+
+Manual setup:
+
+- Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
+- Download pre-trained model: `sh custom_files/download_pretrained.sh`
+- Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
+- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04 ./docker --build-arg FORCE_CUDA=0`
+
+Activation of the environments:
+- Run Docker image: `docker run -it -v $PWD:/sgb au/sgb:10.1-cudnn7-devel-ubuntu18.04`
+- Activate *conda* environment: `conda activate sgb`
+
+- Test model: `sh custom_files/run_validation.test.sh cpu`
+  
+*Output test image can be found in directory:* `custom_images/francesco_example/3_out.jpg`
+
+## 2. Generate Scene Graphs from custom images
 
 ### Work in progress
 
