@@ -18,6 +18,10 @@ RUN pip3 install --upgrade pip
 RUN apt-get install  -y libjpeg8-dev zlib1g-dev
 RUN pip3 install --ignore-installed pillow
 
+RUN pip install requests ninja cython yacs>=0.1.8 numpy>=1.19.5 cython matplotlib opencv-python \
+ protobuf tensorboardx pymongo sklearn boto3 scikit-image cityscapesscripts
+RUN pip install azureml-defaults>=1.0.45 azureml.core inference-schema opencv-python timm einops 
+
 # install requirements
 
 # COPY requirements.txt .
