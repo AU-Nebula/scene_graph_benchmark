@@ -194,7 +194,7 @@ def main():
     # merge(dets[rel['subj_id']]['rect'], dets[rel['obj_id']]['rect'])
 
     for rel in rel_dets:
-        if rel['conf'] >= args.min_rel_score:
+        if rel['conf'] <= args.min_rel_score:
             continue
         if rel["subj_id"] in accepted_nodes and rel["obj_id"] in accepted_nodes:
              edge = {"source": rel["subj_id"], "dest": rel["obj_id"], "bb": [], "class": [rel["class"]], "confidence": [rel["conf"]], "expert": ["causal_tde"]}

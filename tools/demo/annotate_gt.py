@@ -10,7 +10,9 @@ import networkx as nx
 import json, re, ast
 import pydot
 import graphviz
-from fusion.utils import *
+import argparse
+
+# from fusion.utils import *
 from re import A, search
 from networkx import path_graph
 from networkx.drawing.nx_pydot import to_pydot
@@ -168,7 +170,7 @@ def annotate_fusion_gt(ctde_json, step_json):
     return extended_sg
 
 
-def sg_to_graphviz(sg_json):
+def sg_to_graphviz(sg_json, out_path=None):
 
     '''
     Export Scene Graph to GraphViz format     
@@ -255,9 +257,11 @@ def sg_to_graphviz(sg_json):
     dot = to_pydot(G).to_string()
     print(dot)
     skg = Source(dot) # dot is string containing DOT notation of graph
-    skg.view()
-
-
+    # skg.view()
+    if not out_path:
+        skg.render(sg_json.replace(".causal_tde.json","_graph"), view=False)
+    else:
+        skg.render(out_path, view=False)
 
 def isolate_step_gt(S_GT):
 
@@ -317,3 +321,18 @@ def isolate_step_gt(S_GT):
             t = list(tuples.items())
 
     return t
+
+def main():
+
+    parser = argparse.ArgumentParser(description="Graphviz generation Demo")
+    parser.add_argument("--img_file",
+                        help="path to json annotation file")
+    parser.add_argument("--save_file",
+                        help="filename to save the image graph")
+    
+    args = parser.parse_args()
+    
+    sg_to_graphviz(args.img_file, args.save_file)
+
+if __name__ == "__main__":
+    main()

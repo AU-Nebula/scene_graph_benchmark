@@ -144,7 +144,7 @@ def main():
     new_id = {}
     dets_filtered = []
     for i, d in enumerate(dets):
-        if d["conf"] >= args.min_obj_score:
+        if d["conf"] > args.min_obj_score:
              new_id[i] = len(dets_filtered)
              dets_filtered.append(d)
 
@@ -152,7 +152,7 @@ def main():
     for r in rel_dets:
         if r["conf"] <= args.min_rel_score:
              continue
-        if dets[r["subj_id"]]["conf"] >= args.min_rel_score and dets[r["obj_id"]]["conf"] >= args.min_rel_score:
+        if dets[r["subj_id"]]["conf"] > args.min_obj_score and dets[r["obj_id"]]["conf"] > args.min_obj_score:
              new_r = r
              new_r["subj_id"] = new_id[r["subj_id"]]
              new_r["obj_id"] = new_id[r["obj_id"]]
