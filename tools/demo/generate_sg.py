@@ -77,9 +77,9 @@ def main():
                         help="visualize the object attributes")
     parser.add_argument("--visualize_relation", action="store_true",
                         help="visualize the relationships")
-    parser.add_argument("--min_obj_score", metavar="OBJECTS THRESHOLD", type=restricted_float,
+    parser.add_argument("--min_obj_score", metavar="OBJECTS THRESHOLD", type=restricted_float, default=0,
                     	help="threshold to filter objects generation")
-    parser.add_argument("--min_rel_score", metavar="RELATIONSHIPS THRESHOLD", type=restricted_float,
+    parser.add_argument("--min_rel_score", metavar="RELATIONSHIPS THRESHOLD", type=restricted_float, default=0,
                         help="threshold to filter relationships generation")
     parser.add_argument("opts", default=None, nargs=argparse.REMAINDER,
                         help="Modify config options using the command-line")
@@ -205,8 +205,6 @@ def main():
     else:
         save_file = args.save_file
     print("save results to: {}".format(save_file))
-
-    print(graph)
 
     # save results in json format
     with open(save_file, 'w') as f:

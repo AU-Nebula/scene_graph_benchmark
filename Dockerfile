@@ -7,6 +7,12 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 WORKDIR /sgb
 
+# Temporary FIX
+# https://forums.developer.nvidia.com/t/notice-cuda-linux-repository-key-rotation/212771/8
+# TODO: Around May29th check if re-downloading the cuda image without this works
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub 2
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub 2
+
 # install basics & create virtual environment
 
 RUN apt-get update -y \
@@ -18,30 +24,17 @@ RUN pip3 install --upgrade pip
 RUN apt-get install  -y libjpeg8-dev zlib1g-dev
 RUN pip3 install --ignore-installed pillow
 
-RUN pip install requests ninja cython yacs>=0.1.8 numpy>=1.19.5 cython matplotlib opencv-python \
- protobuf tensorboardx pymongo sklearn boto3 scikit-image cityscapesscripts pydot pygraphviz graphviz
-RUN pip install azureml-defaults>=1.0.45 azureml.core inference-schema opencv-python timm einops 
-
 # install requirements
 
-# COPY requirements.txt .
-# RUN pip3 install -r requirements.txt
-
-RUN pip3 install torch==1.7.1+cu101 torchvision==0.8.2+cu101 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html 
-
-RUN pip3 --no-cache-dir install --force-reinstall -I pyyaml
-RUN pip3 install opencv-python pycocotools
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
 
 # install latest PyTorch 1.7.1
 
-# RUN pip3 freeze > requirements.txt
+RUN pip3 install torch==1.7.1+cu101 torchvision==0.8.2+cu101 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html 
 
 # install PyTorch Detection
 ARG FORCE_CUDA="1"
 ENV FORCE_CUDA=${FORCE_CUDA}
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-
-#COPY maskrcnn_benchmark setup.py scene_graph_benchmark tools tests sgg_configs ./
-
-#RUN python setup.py build develop

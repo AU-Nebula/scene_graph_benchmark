@@ -205,20 +205,6 @@ def main():
     cv2.imwrite(save_file, cv2_img)
     print("save results to: {}".format(save_file))
 
-    # save results in text
-    #if cfg.MODEL.ATTRIBUTE_ON and args.visualize_attr:
-    #if cfg.MODEL.ATTRIBUTE_ON:
-        #result_str = ""
-        #for box, label, rel, score, attr_score in zip(rects, labels, rel_labels, scores, attr_scores):
-            #result_str += str(box) + label+'\n'
-            #result_str += ','.join([str(conf) for conf in attr_score])
-            #result_str += '\t'+str(score)+'\n'
-            #result_str += rel+'\n'
-        #text_save_file = op.splitext(save_file)[0] + '_output.txt'
-        #print(result_str)
-        #with open(text_save_file, "w") as fid:
-            #fid.write(result_str)
-
 
 if __name__ == "__main__":
     main()
