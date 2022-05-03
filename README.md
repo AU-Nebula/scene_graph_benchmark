@@ -85,7 +85,7 @@ To restart the container use this command:
 
 **This project is based on [maskrcnn-benchmark](https://github.com/facebookresearch/maskrcnn-benchmark)**
 
-![alt text](demo/R152FPN_demo.png "from https://storage.googleapis.com/openimages/web/index.html")
+![alt text](tools/webcam/R152FPN_demo.png "from https://storage.googleapis.com/openimages/web/index.html")
 
 
 ## Highlights
