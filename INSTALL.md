@@ -3,7 +3,7 @@
 ### Requirements:
 - PyTorch 1.7
 - torchvision 0.8.2
-- cocoapi 
+- pycocotools 2.0.4
 - yacs>=0.1.8
 - numpy>=1.19.5
 - matplotlib 3.3.4
