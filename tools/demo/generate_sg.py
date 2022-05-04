@@ -18,7 +18,7 @@ from maskrcnn_benchmark.data.datasets.utils.load_files import load_labelmap_file
 from maskrcnn_benchmark.utils.miscellaneous import mkdir
 
 from tools.demo.detect_utils import detect_objects_on_single_image
-from tools.demo.visual_utils import draw_bb, draw_rel
+#from tools.demo.visual_utils import draw_bb, draw_rel
 
 
 def postprocess_attr(dataset_attr_labelmap, label_list, conf_list):
@@ -31,6 +31,8 @@ def postprocess_attr(dataset_attr_labelmap, label_list, conf_list):
     attr_dict = {}
     for label, conf in zip(label_list, conf_list):
         label = dataset_attr_labelmap[label]
+        label = label.strip()
+
         if label in common_attributes and conf < common_attributes_thresh:
             continue
         if label in attr_alias_dict:
@@ -49,7 +51,18 @@ def postprocess_attr(dataset_attr_labelmap, label_list, conf_list):
         return [[], []]
 
 
+def restricted_float(x):
+    try:
+        x = float(x)
+    except ValueError:
+        raise argparse.ArgumentTypeError("%r not a floating-point literal" % (x,))
+
+    if x < 0.0 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,))
+    return x
+
 def main():
+
     parser = argparse.ArgumentParser(description="Object Detection Demo")
     parser.add_argument("--config_file", metavar="FILE",
                         help="path to config file")
@@ -58,12 +71,16 @@ def main():
                         help="labelmap file to select classes for visualizatioin")
     parser.add_argument("--save_file", required=False, type=str, default=None,
                         help="filename to save the proceed image")
-    parser.add_argument("--visualize_attr", action="store_true",
-                        help="visualize the object attributes")
     parser.add_argument("--device", default="cuda",
                         help="choose the device you want to work with")
+    parser.add_argument("--visualize_attr", action="store_true",
+                        help="visualize the object attributes")
     parser.add_argument("--visualize_relation", action="store_true",
                         help="visualize the relationships")
+    parser.add_argument("--min_obj_score", metavar="OBJECTS THRESHOLD", type=restricted_float, default=0,
+                    	help="threshold to filter objects generation")
+    parser.add_argument("--min_rel_score", metavar="RELATIONSHIPS THRESHOLD", type=restricted_float, default=0,
+                        help="threshold to filter relationships generation")
     parser.add_argument("opts", default=None, nargs=argparse.REMAINDER,
                         help="Modify config options using the command-line")
 
@@ -113,7 +130,7 @@ def main():
         dataset_attr_labelmap = {
             int(val): key for key, val in
             dataset_allmap['attribute_to_idx'].items()}
-    
+
     if cfg.MODEL.RELATION_ON and args.visualize_relation:
         dataset_relation_labelmap = {
             int(val): key for key, val in
@@ -129,11 +146,14 @@ def main():
 
     for obj in dets:
         obj["class"] = dataset_labelmap[obj["class"]]
+        obj["class"] = obj["class"].strip()
+    
     if visual_labelmap is not None:
         dets = [d for d in dets if d['class'] in visual_labelmap]
     if cfg.MODEL.ATTRIBUTE_ON and args.visualize_attr:
         for obj in dets:
             obj["attr"], obj["attr_conf"] = postprocess_attr(dataset_attr_labelmap, obj["attr"], obj["attr_conf"])
+
     if cfg.MODEL.RELATION_ON and args.visualize_relation:
         for rel in rel_dets:
             rel['class'] = dataset_relation_labelmap[rel['class']]
@@ -145,6 +165,7 @@ def main():
 
     rects = [d["rect"] for d in dets]
     scores = [d["conf"] for d in dets]
+
     if cfg.MODEL.ATTRIBUTE_ON and args.visualize_attr:
         attr_labels = [','.join(d["attr"]) for d in dets]
         attr_scores = [d["attr_conf"] for d in dets]
@@ -153,32 +174,41 @@ def main():
     else:
         labels = [d["class"] for d in dets]
 
-    draw_bb(cv2_img, rects, labels, scores)
+    #draw_bb(cv2_img, rects, labels, scores)
+    
+    graph = {"frame":args.img_file,
+             "nodes":[],
+             "edges":[],
+             "lighthouse":[]
+	    }
 
-    if cfg.MODEL.RELATION_ON and args.visualize_relation:
-        rel_subj_centers = [r['subj_center'] for r in rel_dets]
-        rel_obj_centers = [r['obj_center'] for r in rel_dets]
-        rel_scores = [r['conf'] for r in rel_dets]
-        rel_labels = [r['class'] for r in rel_dets]
-        draw_rel(cv2_img, rel_subj_centers, rel_obj_centers, rel_labels, rel_scores)
+    accepted_nodes = set()
+
+    for id,rect in enumerate(rects):
+        if scores[id] <= args.min_obj_score:
+            continue
+        accepted_nodes.add(id)
+        node = {"id": id, "bb": rect, "kg_mapping":[], "class": [labels[id].strip()], "confidence":[scores[id]], "expert": ["causal_tde"]}
+        graph["nodes"].append(node)
+
+    # merge(dets[rel['subj_id']]['rect'], dets[rel['obj_id']]['rect'])
+
+    for rel in rel_dets:
+        if rel['conf'] <= args.min_rel_score:
+            continue
+        if rel["subj_id"] in accepted_nodes and rel["obj_id"] in accepted_nodes:
+             edge = {"source": rel["subj_id"], "dest": rel["obj_id"], "bb": [], "class": [rel["class"]], "confidence": [rel["conf"]], "expert": ["causal_tde"]}
+             graph["edges"].append(edge)
 
     if not args.save_file:
-        save_file = op.splitext(args.img_file)[0] + ".detect.jpg"
+        save_file = op.splitext(args.img_file)[0] + ".causal_tde.json"
     else:
         save_file = args.save_file
-    cv2.imwrite(save_file, cv2_img)
     print("save results to: {}".format(save_file))
 
-    # save results in text
-    if cfg.MODEL.ATTRIBUTE_ON and args.visualize_attr:
-        result_str = ""
-        for label, score, attr_score in zip(labels, scores, attr_scores):
-            result_str += label+'\n'
-            result_str += ','.join([str(conf) for conf in attr_score])
-            result_str += '\t'+str(score)+'\n'
-        text_save_file = op.splitext(save_file)[0] + '.txt'
-        with open(text_save_file, "w") as fid:
-            fid.write(result_str)
+    # save results in json format
+    with open(save_file, 'w') as f:
+        json.dump(graph, f, indent=4)
 
 
 if __name__ == "__main__":
