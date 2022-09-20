@@ -51,6 +51,7 @@ class context_encoder(nn.Module):
         self.rel_classes = rel_classes
         self.num_classes = len(self.obj_classes)
         self.num_rels = len(self.rel_classes)
+        self.device = config.MODEL.DEVICE
 
         self.debug = config.MODEL.ROI_RELATION_HEAD.NEURAL_MOTIF.DEBUG
         # to add entries to those params in NM repo
@@ -178,7 +179,7 @@ class context_encoder(nn.Module):
         # there should be softmax here.
         confidence = F.softmax(obj_dists, dim=1).data.view(-1)[
             obj_preds.data + arange(obj_preds.data) * self.num_classes]
-        perm, inv_perm, ls_transposed = self.roi_sorter.sort(im_inds.data, confidence, box_priors)
+        perm, inv_perm, ls_transposed = self.roi_sorter.sort(im_inds.data, confidence, box_priors, self.device)
 
         edge_input_packed = PackedSequence(inp_feats[perm], ls_transposed)
         edge_reps = self.edge_ctx_rnn(edge_input_packed)[0][0]

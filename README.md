@@ -10,38 +10,90 @@ For any question you can contact:
 
 ## 0. Prerequisites
 
+Docker is required to use the repository
 
-
-## 0. Requirements
-
-## 1. Setup for first-time use (Docker)
+## 1. Setup for first-time use
 
 - Clone repository: `git clone https://github.com/AU-Nebula/scene_graph_benchmark.git SGB`
 - Change directory: `cd SGB`
+
+If at least one GPU is available, follow section 1a, if not, follow 1b.
+
+### 1a. Setup for first-time use - GPUs required
+
+For an automatic setup, use the following command: `sh installation_steps.sh 1`.
+
+Manual setup:
+
+- Download *Visual Genome* metadata: `sh scripts/download_VG.sh`
+- Download pre-trained model: `sh scripts/download_pretrained.sh`
 - Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
-- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04-pip3 .`
-- Run it: `docker run -it -v $PWD:/kern_nemesis --gpus all au/sgb:10.1-cudnn7-devel-ubuntu18.04-pip3`
-- Build `maskrcnn_benchmark`: `python setup.py build develop`
+- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04-pip3 . --build-arg FORCE_CUDA=1`
 
-Outside Docker:
+Activation of the environment:
+- Run Docker image: `docker run -it --name "sgb-container" -v $PWD:/sgb --gpus all au/sgb:10.1-cudnn7-devel-ubuntu18.04-pip3`
 
-- Download *Visual Genome* metadata: `sh custom_files/download_VG.sh`
-- Download pre-trained model: `sh custom_files/download_pretrained.sh`
+Installation of the code *inside Docker*:
+- Install modules: `python setup.py build develop`
 
-*This operation might take a while... Make yourself a coffee!*
+### 1b. Setup for first-time use - CPU-only case
 
-## 2. Generate Scene Graphs with custom dataset
+For an automatic setup, use the following command: `sh installation_steps.sh 0`.
 
-### Work in progress
+Manual setup:
 
-#
+- Download *Visual Genome* metadata: `sh scripts/download_VG.sh`
+- Download pre-trained model: `sh scripts/download_pretrained.sh`
+- Download NVIDIA Docker image: `docker pull nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04`
+- Build Docker image: `docker build -t au/sgb:10.1-cudnn7-devel-ubuntu18.04-pip3 . --build-arg FORCE_CUDA=0`
 
-You can find below the original README
+Activation of the environment:
+- Run Docker image: `docker run -it --name "sgb-container" -v $PWD:/sgb au/sgb:10.1-cudnn7-devel-ubuntu18.04-pip3`
 
-#
+Installation of the code *inside Docker*:
+- Install modules: `python setup.py build develop`
+
+### 2. Generate Scene Graphs from custom images
+
+Once the setup is completed, to test the model use this command inside the running container:
+
+`./scripts/run_validation_image.sh -d `**`DEVICE`**` -i Example/pexels-daniel-frese-574177.jpg`
+
+Substitute **`DEVICE`** with `cuda` if you set up the repository through 1a, otherwise substitute it with `cpu`
+
+If you wish to use a different image, specify the **`PATH`** after the `-i` option:
+
+`./scripts/run_validation_image.sh -d `**`DEVICE`**` -i `**`PATH`**
+
+If you wish to set thresholds for the objects and the relations, use the following command:
+
+`./scripts/run_validation_image.sh -d `**`DEVICE`**` -i `**`PATH`**` -o `**`Obj_th`**` -r `**`Rel_th`**
+
+where **`Obj_th`** and **`Rel_th`** are numbers in the interval [0,1) and are respectively the object and relation thresholds. Objects detected with confidence less than or equal to **`Obj_th`** are filtered out. The same goes with relations and **`Rel_th`**.
+
+An example of input and output content can be found in the directory: `Example`
+
+In particular:
+- `pexels-daniel-frese-574177.jpg`: sample input image
+- `pexels-daniel-frese-574177_annotated.jpg`: output annotated image
+- `pexels-daniel-frese-574177_causal_tde.json`: document containing the graph in json format
+- `pexels-daniel-frese-574177_graph.pdf`: pdf file containing the schematized graph
+
+### 3. Starting and stopping the container
+
+Once you have finished testing the model, you can stop the container either using *ctrl+d* inside Docker or using this command in another shell:
+
+`docker stop sgb-container`
+
+To restart the container use this command:
+
+`docker start -a sgb-container`
+
+---
+
 **This project is based on [maskrcnn-benchmark](https://github.com/facebookresearch/maskrcnn-benchmark)**
 
-![alt text](demo/R152FPN_demo.png "from https://storage.googleapis.com/openimages/web/index.html")
+![alt text](tools/webcam/R152FPN_demo.png "from https://storage.googleapis.com/openimages/web/index.html")
 
 
 ## Highlights
