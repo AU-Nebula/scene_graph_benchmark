@@ -4,6 +4,7 @@ import cv2
 import os.path as op
 import argparse
 import json
+import torch
 
 from scene_graph_benchmark.scene_parser import SceneParser
 from scene_graph_benchmark.AttrRCNN import AttrRCNN
@@ -69,6 +70,8 @@ def main():
                         help="filename to save the proceed image")
     parser.add_argument("--visualize_attr", action="store_true",
                         help="visualize the object attributes")
+    parser.add_argument("--device", default="cuda",
+                        help="choose the device you want to work with")
     parser.add_argument("--visualize_relation", action="store_true",
                         help="visualize the relationships")
     parser.add_argument("--min_obj_score", metavar="OBJECTS THRESHOLD", type=restricted_float, default=0,
@@ -79,6 +82,11 @@ def main():
                         help="Modify config options using the command-line")
 
     args = parser.parse_args()
+
+    if not torch.cuda.is_available() and args.device=="cuda":
+        raise RuntimeError("No GPU available. Please check the device selected or set up again the software by following the steps in the README file in section 1b")
+
+    cfg.MODEL.DEVICE = args.device
     cfg.set_new_allowed(True)
     cfg.merge_from_other_cfg(sg_cfg)
     cfg.set_new_allowed(False)
@@ -136,7 +144,7 @@ def main():
     new_id = {}
     dets_filtered = []
     for i, d in enumerate(dets):
-        if d["conf"] >= args.min_obj_score:
+        if d["conf"] > args.min_obj_score:
              new_id[i] = len(dets_filtered)
              dets_filtered.append(d)
 
@@ -144,7 +152,7 @@ def main():
     for r in rel_dets:
         if r["conf"] <= args.min_rel_score:
              continue
-        if dets[r["subj_id"]]["conf"] >= args.min_rel_score and dets[r["obj_id"]]["conf"] >= args.min_rel_score:
+        if dets[r["subj_id"]]["conf"] > args.min_obj_score and dets[r["obj_id"]]["conf"] > args.min_obj_score:
              new_r = r
              new_r["subj_id"] = new_id[r["subj_id"]]
              new_r["obj_id"] = new_id[r["obj_id"]]
@@ -196,20 +204,6 @@ def main():
         save_file = args.save_file
     cv2.imwrite(save_file, cv2_img)
     print("save results to: {}".format(save_file))
-
-    # save results in text
-    #if cfg.MODEL.ATTRIBUTE_ON and args.visualize_attr:
-    #if cfg.MODEL.ATTRIBUTE_ON:
-        #result_str = ""
-        #for box, label, rel, score, attr_score in zip(rects, labels, rel_labels, scores, attr_scores):
-            #result_str += str(box) + label+'\n'
-            #result_str += ','.join([str(conf) for conf in attr_score])
-            #result_str += '\t'+str(score)+'\n'
-            #result_str += rel+'\n'
-        #text_save_file = op.splitext(save_file)[0] + '_output.txt'
-        #print(result_str)
-        #with open(text_save_file, "w") as fid:
-            #fid.write(result_str)
 
 
 if __name__ == "__main__":
